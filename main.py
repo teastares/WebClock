@@ -45,8 +45,8 @@ class CourseSpider(util.Spider):
 
     def scan_notice(self, course):
         notice_url = urls.notice + course.id
-        #self.gethtml(notice_url)
-        self.gethtml('http://learn.tsinghua.edu.cn/MultiLanguage/public/bbs/getnoteid_student.jsp?course_id=112189')
+        self.gethtml(notice_url)
+        #self.gethtml('http://learn.tsinghua.edu.cn/MultiLanguage/public/bbs/getnoteid_student.jsp?course_id=112189')
         notices_html = re.findall('<tr class="tr.*?</tr>', self.html.text, re.S)
         #The variable "count" counts how many unread notices have been processed 
         count = 0
