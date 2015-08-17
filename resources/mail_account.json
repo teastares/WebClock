@@ -1,0 +1,6 @@
+{
+	"host" : "*",
+	"user" : "*",
+	"userpass": "*",
+	"to_user" : "*"
+}

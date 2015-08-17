@@ -5,7 +5,7 @@ import json
 import requests
 import re
 import time
-
+import mail
 def get_account():
     """
     get the account information from the /resources/account.json file,
@@ -64,6 +64,23 @@ class CourseSpider(util.Spider):
 
     def send_to_email(self, title, text):
         #This is the function to send the message to the email.
+		mail_info = json.load(open('resources/mail_account.json'))
+		mail_host = mail_info["host"]
+		mail_user = mail_info["user"]
+		mail_psw = mail_info["userpass"]
+		to_user = mail_info["to_user"]
+		if host == '*' or mail_user == '*' or mail_psw == "*":
+			print("Please enter your mail's host"")
+			mail_host = input()
+			print("Please enter your mail's username:")
+			mail_user = input()
+			print("Please enter your mail's password:")
+			mail_psw = input()
+		if to_user == "*" ：
+			print("plsase enter the mail you want to send")
+			to_user = input()
+		sender = mail.mail_sender(mail_host,mail_user,mail_psw)
+		sender.sendmsg(title,text,to_user)
         pass
 
 if __name__ == '__main__':
