@@ -76,12 +76,12 @@ class CourseSpider(util.Spider):
 			mail_user = input()
 			print("Please enter your mail's password:")
 			mail_psw = input()
-		if to_user == "*" ：
+		if to_user == "*" :
 			print("plsase enter the mail you want to send")
 			to_user = input()
 		sender = mail.mail_sender(mail_host,mail_user,mail_psw)
 		sender.sendmsg(title,text,to_user)
-        pass
+
 
 if __name__ == '__main__':
 
