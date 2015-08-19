@@ -28,7 +28,11 @@ def get_headers():
     return headers
 
 def send_to_email(title, text):
-#This is the function to send the message to the email.
+    """
+    This is the function to send the message to the email.
+    title refer to the title of the message,
+    text is the main text of the message
+    """
     mail_info = json.load(open('resources/mail_account.json'))
     mail_host = mail_info["host"]
     mail_user = mail_info["user"]
@@ -43,53 +47,56 @@ def send_to_email(title, text):
     sender = mail.mail_sender(mail_host,mail_user,mail_psw)
     sender.sendmsg(title,text,to_user)
 
-class CourseSpider(util.Spider):
+def scan_courses(html, courses_list):
     """
-    This is a spider to get the information of the NetCourses
+    This is the function to scan the courses of the courselist
     """
-    def scan_courses(self, courses_list):
-        self.gethtml(urls.courses)
-        courses_html = re.findall('<tr class="info_.*?</tr>', self.html.text, re.S)
-        for course_html in courses_html:
-            course = util.Course(re.search('target="_blank">(.*?)</a>', course_html, re.S).group(1).replace(' ', '').replace('\n', ''))
-            url = re.search('<a href="(.*?)"', course_html, re.S).group(1)
-            course.get_id(url[-6:])
-            news = re.findall('red_text">(.*?)</', course_html, re.S)
-            course.get_news(news)
-            # To add this course into the courses_list
-            courses_list.append(course)
+    courses_html = re.findall('<tr class="info_.*?</tr>', html, re.S)
+    for course_html in courses_html:
+        course = util.Course(re.search('target="_blank">(.*?)</a>', course_html, re.S).group(1).replace(' ', '').replace('\n', ''))
+        url = re.search('<a href="(.*?)"', course_html, re.S).group(1)
+        course.get_id(url[-6:])
+        news = re.findall('red_text">(.*?)</', course_html, re.S)
+        course.get_news(news)
+        # To add this course into the courses_list
+        courses_list.append(course)
 
-    def scan_notice(self, course):
-        notice_url = urls.notice + course.id
-        self.gethtml(notice_url)
-        #self.gethtml('http://learn.tsinghua.edu.cn/MultiLanguage/public/bbs/getnoteid_student.jsp?course_id=112189')
-        notices_html = re.findall('<tr class="tr.*?</tr>', self.html.text, re.S)
-        #The variable "count" counts how many unread notices have been processed 
-        count = 0
-        for notice_html in notices_html:
-            if count >= course.new_notice:
-               break
-            flag = re.findall("<td width='20%' align='center' height=25>(.*?)</td>", notice_html, re.S)[1]
-            if flag == '未读':
-                count += 1
-                notice_url = 'http://learn.tsinghua.edu.cn/MultiLanguage/public/bbs/' + re.search("<a  href='(.*?)'>", notice_html, re.S).group(1)
-                self.gethtml(notice_url)
-                title = re.search('colspan="3">(.*?)</td>', self.html.text, re.S).group(1)
-                text = re.search('overflow:hidden;">(.*?)&nbsp', self.html.text, re.S).group(1)
-                send_to_email(title, text)
-
+def scan_notice(spider, course):
+    """
+    This is the function to scan the notices for one course, and find the ones which are unread.
+    """
+    #spider.gethtml('http://learn.tsinghua.edu.cn/MultiLanguage/public/bbs/getnoteid_student.jsp?course_id=112189')
+    notice_url = urls.notice + course.id
+    spider.gethtml(notice_url)
+    notices_html = re.findall('<tr class="tr.*?</tr>', spider.html, re.S)
+    #The variable "count" counts how many unread notices have been processed, so we can ensure that we won't scan more that we expected.
+    count = 0
+    for notice_html in notices_html:
+        if count >= course.new_notice:
+           break
+        flag = re.findall("<td width='20%' align='center' height=25>(.*?)</td>", notice_html, re.S)[1]
+        if flag == '未读':
+            count += 1
+            notice_url = 'http://learn.tsinghua.edu.cn/MultiLanguage/public/bbs/' + re.search("<a  href='(.*?)'>", notice_html, re.S).group(1)
+            spider.gethtml(notice_url)
+            title = re.search('colspan="3">(.*?)</td>', spider.html, re.S).group(1)
+            text = re.search('overflow:hidden;">(.*?)&nbsp', spider.html, re.S).group(1)
+            send_to_email(title, text)
 
 if __name__ == '__main__':
 
-    spider = CourseSpider()
+    spider = util.Spider()
     spider.login(urls.login, get_account(), get_headers())
     while True:
         courses_list = []
-        spider.scan_courses(courses_list)
+        html = spider.gethtml(urls.courses)
+        scan_courses(html, courses_list)
         #To find the detail of each course
         for course in courses_list:
+            print('----------------------------')
             print(course)
-            if course.new_notice != 0:
-                spider.scan_notice(course)
+
+            #scan the notice list to get the notice not read
+            scan_notice(spider, course)
 
         time.sleep(5) 

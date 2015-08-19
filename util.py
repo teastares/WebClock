@@ -38,5 +38,5 @@ class Spider(object):
             self.session.post(url, data = data, headers = headers)
 
     def gethtml(self, url):
-        self.html = self.session.get(url)
+        self.html = self.session.get(url).text
         return self.html
