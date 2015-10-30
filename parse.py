@@ -1,9 +1,6 @@
 #!/usr/bin/python3
 from bs4 import BeautifulSoup
 
-f = open('course.txt')
-html = f.read()
-
 def get_courses(html):
     """
     Get the information for each course,
