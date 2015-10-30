@@ -25,29 +25,17 @@ v0.1版本实现了基本的登录以及获取未读公告的功能，由于pyth
 此脚本的程序结构如下：
 
 ├── db.py
-
 ├── LICENSE
-
 ├── mail.py
-
 ├── main.py
-
 ├── parse.py
-
 ├── README.md
-
 ├── resources
-
 │   ├── account.json
-
 │   ├── headers.json
-
 │   ├── \__init\__.py
-
 │   ├── mail_account.json
-
 │   └── urls.py
-
 └── util.py
 
 
