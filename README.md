@@ -24,22 +24,21 @@ v0.1版本实现了基本的登录以及获取未读公告的功能，由于pyth
 
 此脚本的程序结构如下：
 
+├── db.py
 ├── LICENSE
-
+├── mail.py
 ├── main.py
-
+├── parse.py
+├── README.md
 ├── resources
-
 │   ├── account.json
-
 │   ├── headers.json
-
 │   ├── \__init\__.py
-
+│   ├── mail_account.json
 │   └── urls.py
-
 └── util.py
 
 main.py为爬虫的主程序，util.py储存了一些需要的数据结构，resources/urls.py 储存了一些需要的url。
 
 而将用户信息（用户名和密码）储存在resources/account.json中。
+
