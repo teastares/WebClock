@@ -10,8 +10,14 @@ courses = base + '/MultiLanguage/lesson/student/MyCourse.jsp?language=cn'
 #url for the notice of one specific course
 notice = base + '/MultiLanguage/public/bbs/getnoteid_student.jsp?course_id='
 
+#url for the detail of each notice
+notice_detail = base + '/MultiLanguage/public/bbs/'
+
 #url for the homework of one specific course
 homework = base + '/MultiLanguage/lesson/student/hom_wk_brw.jsp?course_id='
+
+#url for the detail of each homework
+homework_detail = base + '/MultiLanguage/lesson/student/'
 
 #url for the files of one specific course
 files = base + '/MultiLanguage/lesson/student/download.jsp?course_id='
