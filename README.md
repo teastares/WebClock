@@ -1,4 +1,4 @@
-# Tsinghua_Course_Spider v0.1
+WebClock v0.11
 
 此爬虫程序希望从清华大学网络学上获取信息并发送至指定邮箱，通过邮箱和微信的关联而使得我们能够从微信上及时收到网络学堂的更新信息。
 
@@ -33,11 +33,11 @@ v0.1版本实现了基本的登录以及获取未读公告的功能，由于pyth
 ├── resources</br>
 │   ├── account.json</br>
 │   ├── headers.json</br>
-│   ├── \__init\__.py</br>
-│   ├── mail_account.json</br>
+│   ├── __init__.py</br>
+│   ├── mail\_account.json</br>
 │   └── urls.py</br>
+├── setting.py</br>
 └── util.py</br>
-
 
 main.py为爬虫的主程序，util.py储存了一些需要的数据结构，resources/urls.py 储存了一些需要的url。
 
