@@ -1,7 +1,6 @@
 #-*- encoding: utf-8 -*-
 import smtplib
 import email
-import mail
 from email.mime.text import MIMEText
 
 
@@ -10,7 +9,7 @@ class mail_sender():
 		self.host = host
 		self.user = user
 		self.loginSmtp(host,user,psw)
-		
+
 	def loginSmtp(self,host,user,psw):
 		self.sender=smtplib.SMTP(host,timeout=30)
 		self.sender.login(user,psw)
@@ -40,7 +39,5 @@ def send_to_email(title, text):
         mail_psw = input("Sending mail's password: ")
     if to_user == "*" :
         to_user = input("Receiving mail: ")
-    sender = mail.mail_sender(mail_host,mail_user,mail_psw)
+    sender = mail_sender(mail_host,mail_user,mail_psw)
     sender.sendmsg(title,text,to_user)
-
-

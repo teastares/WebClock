@@ -66,14 +66,20 @@ class Student(object):
 class Course(object):
     """
     Course stores the information about a specific course,
-    including its url, course name, and the number of new notice\ 
+    including its url, course name, and the number of new notice\
     new homework\ new files.
+    news[0] -> new homework, int
+    news[1] -> new notice, int
+    news[2] -> new file, int
     """
     def __init__(self, course_id, name, url):
         self.course_id = course_id
         self.name = name
         self.url = urls.base + url
         self.news = [0, 0, 0]
+
+    def get_newhomework(self, spider):
+        pass
 
     def __str__(self):
         return self.name
