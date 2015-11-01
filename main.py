@@ -3,13 +3,20 @@ import setting
 import util
 import re
 import time
+import random
 
 if __name__ == '__main__':
 
     student = util.Student()
     student.login()
     student.get_courses()
+    last_time = time.time() 
     while True:
+
+        if time.time() - last_time >= (600 + random.randint(-60,60)):
+            student.login()
+            last_time = time.time()
+
         student.get_news()
         for course in student.courses.values():
             if setting.Enable_Hw == 1 and course.news[0] > 0:

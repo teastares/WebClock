@@ -14,7 +14,7 @@ def get_courses(html):
         #NOTE THE NEW WEB
         url = info['href']
         name = re.sub(r'[ \n\r\t]', '',info.contents[0])[:-15]
-        course_id = int(url[-6:])
+        course_id = url[-6:]
         info = (course_id, name, url)
         yield(info)
 
@@ -26,7 +26,7 @@ def get_news(html):
     """
     soup = BeautifulSoup(html, "html.parser")
     for course in soup.find_all('tr', class_ = ['info_tr', 'info_tr2']):
-        course_id = int(course.find('a')['href'][-6:])
+        course_id = course.find('a')['href'][-6:]
         info = [course_id]
         news = course.find_all('td')[1:]
         for item in news:
@@ -42,7 +42,7 @@ def get_newhomework(html):
     soup = BeautifulSoup(html, "html.parser")
     for homework in soup.find_all('tr', class_ = ['tr1', 'tr2']):
         url = homework.find('a')['href']
-        homework_id = int(re.search('\d{6}', url).group(0))
+        homework_id = re.search('\d{6}', url).group(0)
         title = homework.find('a').get_text()
         state = homework.find('td', width = ['15%']).get_text()
         state = re.sub(r'[ \n\r\t]', '',state)

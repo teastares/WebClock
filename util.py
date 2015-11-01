@@ -44,7 +44,7 @@ class Student(object):
     def get_courses(self):
         """
         To get the courses for one student,
-        info[0] -> course_id, int
+        info[0] -> course_id, str
         info[1] -> name, str
         info[2] -> url, str
         """
@@ -56,7 +56,7 @@ class Student(object):
         """
         To get to know how many new notice,
         file, and homework are there in the web.
-        info[0] -> course_id, int
+        info[0] -> course_id, str
         info[1] -> new homework, int
         info[2] -> new notice, int
         info[3] -> new file, int
@@ -87,13 +87,13 @@ class Course(object):
     def get_newhomework(self, spider):
         """
         Get the information for homework,
-        info[0] -> homework id, int
+        info[0] -> homework id, str
         info[1] -> url, str
         info[2] -> title, str
         info[3] -> state, str
         info[4] -> deadline, str
         """
-        spider.get_html(urls.homework + str(self.course_id))
+        spider.get_html(urls.homework + self.course_id)
         for info in parse.get_newhomework(spider.html):
             deadline = datetime.strptime(info[4] + '-23-59-59', "%Y-%m-%d-%H-%M-%S")
             if deadline < datetime.today() or info[3] == "已经提交":
@@ -136,7 +136,7 @@ class Course(object):
                 homework[4] += 1
 
     def send_newnotice(self, spider):
-        spider.get_html(urls.notice + str(self.course_id))
+        spider.get_html(urls.notice + self.course_id)
         for notice in parse.get_newnotice(spider.html, self.news[1]):
             url = urls.notice_detail + notice[0]
             spider.get_html(url)
