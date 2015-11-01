@@ -1,5 +1,7 @@
 WebClock v0.11
 
+使用说明：<a href="https://github.com/teastares/WebClock/wiki">WebClock Wiki</a>
+
 此爬虫程序希望从清华大学网络学上获取信息并发送至指定邮箱，通过邮箱和微信的关联而使得我们能够从微信上及时收到网络学堂的更新信息。
 
 包括：新发布的公告，新发布的作业，新上传的文件。
