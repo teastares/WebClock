@@ -137,6 +137,7 @@ class Course(object):
 
     def send_newnotice(self, spider):
         spider.get_html(urls.notice + self.course_id)
+        #print('Try to do this:\n\n' + spider.html + '\n\n')
         for notice in parse.get_newnotice(spider.html, self.news[1]):
             url = urls.notice_detail + notice[0]
             spider.get_html(url)
@@ -147,7 +148,21 @@ class Course(object):
             mail.send_to_email(title, text)
 
     def send_newfile(self, spider):
-        pass
+        """
+        Send the information that new files have been put in the website
+        newfile[0] -> url, str
+        newfile[1] -> title, str
+        newfile[2] -> description, str
+        newfile[3] -> filesize, str
+        maybe later we can add a function that send the file directly to the mail of user with url of files
+        """    
+        spider.get_html(urls.files + self.course_id)
+        #print('Try to do this:\n\n' + spider.html + '\n\n')
+        for newfile in parse.get_newfile(spider.html, self.news[2]):
+            title = '【' + 'New File ' + self.name + '】' +newfile[1]
+            text = 'Description: \n' + newfile[2] + '\n\n'
+            text += 'File size: \n' + newfile[3] + '\n\n'
+            mail.send_to_email(title, text)
 
     def __str__(self):
         return self.name
