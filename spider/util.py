@@ -43,7 +43,10 @@ class Student(object):
 
     def is_logged(self):
         html = self.spider.session.get(urls.courses).text
-        print(len(html))
+        if len(html) >= 500:
+            return True
+        else:
+            return False
 
     def get_courses(self, db):
         """
@@ -108,7 +111,7 @@ class Course(object):
         self.enable_notice = enable_notice
         self.enable_file =enable_file
 
-    def get_newhomework(self, spider, db):
+    def get_newhomework(self, spider, user, db):
         """
         Get the information for homework, from the database
         and then ask for more information for homework from the website
@@ -125,7 +128,8 @@ class Course(object):
         spider.get_html(urls.homework + self.course_id)
         for info in parse.get_newhomework(spider.html):
             sql = "select deadline, send_state, alarm_state from Homework \
-                   where course_id = '%s' and homework_id = '%s'" % (self.course_id, info[0])
+                   where course_id = '%s' and homework_id = '%s' and user_id = '%s'" \
+                   % (self.course_id, info[0], user[0])
             data = db.fetch_all(sql)
             if not data:
                 deadline = datetime.strptime(info[4] + '-23-59-59', "%Y-%m-%d-%H-%M-%S")
@@ -134,20 +138,20 @@ class Course(object):
                 if deadline > datetime.today() and info[3] == "尚未提交":
                     self.homework[info[0]] = [info[1], info[2],deadline, 0, 0]
                     sql = "insert into Homework(course_id, homework_id, url, \
-                           homework_name, deadline, send_state, alarm_state) \
-                           values ('%s', '%s', '%s', '%s', '%s', '%d', '%d')" \
-                           %(self.course_id, info[0], info[1], info[2], deadline, 0, 0)
+                           homework_name, deadline, send_state, alarm_state, user_id) \
+                           values ('%s', '%s', '%s', '%s', '%s', '%d', '%d', '%s')" \
+                           %(self.course_id, info[0], info[1], info[2], deadline, 0, 0, user[0])
                     db.update(sql)
             else:
                 if data[0][0] < datetime.today() or info[3] == "已经提交":
-                    sql = "delete from Homework where course_id = '%s' and homework_id = '%s'" \
-                           % (self.course_id, info[0])
+                    sql = "delete from Homework where course_id = '%s' and homework_id = '%s' and \
+                    user_id = '%s'" % (self.course_id, info[0], user[0])
                     db.update(sql)
                 else:
                     self.homework[info[0]] = [info[1], info[2], data[0][0], data[0][1], data[0][2]]
 
 
-    def send_newhomework(self, spider, db):
+    def send_newhomework(self, spider, user, db):
         for key, homework in self.homework.items():
             if homework[3] == 0:
                 spider.get_html(urls.homework_detail + homework[0])
@@ -157,34 +161,36 @@ class Course(object):
                 title = '【' + 'New HomeWork ' + self.name +  '】' + homework[1]
                 text = 'Instruction:\n' + info + '\n\n'
                 text += 'Deadline:\n' + str(homework[2])
-                mail.send_to_email(title, text)
+                mail.send_to_email(title, text, user[2])
                 homework[3] = 1
                 sql = "update Homework set send_state = '%d' \
-                       where course_id = '%s' and homework_id = '%s'" % (homework[3], self.course_id, key)
+                       where course_id = '%s' and homework_id = '%s' and user_id = '%s'" \
+                       % (homework[3], self.course_id, key, user[0])
                 db.update(sql)
 
-    def alarm_homework(self, db):
+    def alarm_homework(self, user, db):
         for key, homework in self.homework.items():
             residual_time = (homework[2] - datetime.today()).total_seconds()
             title = '【' + 'Homework Alarm ' + self.name +  '】' + homework[1]
             text = 'Deadline:\n' + str(homework[2]) + '\n\n'
             if homework[4] == 0 and residual_time <= 172800:
                 text += 'The residual time is less than 48 hours.\n\n'
-                mail.send_to_email(title, text)
+                mail.send_to_email(title, text, user[2])
                 homework[4] += 1
             elif homework[4] == 1 and residual_time <= 43200:
                 text += 'The residual time is less than 12 hours.\n\n'
-                mail.send_to_email(title, text)
+                mail.send_to_email(title, text, user[2])
                 homework[4] += 1
             elif homework[4] == 2 and residual_time <= 10800:
                 text += 'The residual time is less than 3 hours.\n\n'
-                mail.send_to_email(title, text)
+                mail.send_to_email(title, text, user[2])
                 homework[4] += 1
             sql = "update Homework set alarm_state = '%d' \
-                   where course_id = '%s' and homework_id = '%s'" % (homework[4], self.course_id, key)
+                   where course_id = '%s' and homework_id = '%s' and user_id = '%s'" \
+                   % (homework[4], self.course_id, key, user[0])
             db.update(sql)
 
-    def get_newfile(self, spider, db):
+    def get_newfile(self, spider, user, db):
         """
         Get the information for file,
         info[0] -> file id, str
@@ -197,17 +203,14 @@ class Course(object):
         spider.get_html(urls.files + self.course_id)
         for info in parse.get_newfile(spider.html, self.enable_file):
             sql = "select file_id, course_id, send_state from File \
-                   where course_id = '%s' and file_id = '%s'" % (self.course_id, info[0])
+                   where course_id = '%s' and file_id = '%s' and user_id = '%s'" \
+                   % (self.course_id, info[0], user[0])
             data = db.fetch_all(sql)
-            #print(data)
-            #break
             if not data:
-                sql = "insert into File(file_id, course_id, send_state) \
-                       values ('%s', '%s', '%d')" \
-                       %(info[0], self.course_id, info[5])
+                sql = "insert into File(file_id, course_id, send_state, user_id) \
+                       values ('%s', '%s', '%d', '%s')" \
+                       %(info[0], self.course_id, info[5], user[0])
                 db.update(sql)
-                #print(info[0] +'\n'+ self.course_id +'\n'+ str(info[5]))
-                #break
                 if info[0] not in self.file:
                     self.file[info[0]] = [info[1], info[2], info[3], info[4], info[5]]
             else:
@@ -215,7 +218,7 @@ class Course(object):
                     self.file[info[0]] = [info[1], info[2], info[3], info[4], data[0][2]]
 
 
-    def send_newfile(self, spider, db):
+    def send_newfile(self, spider, user, db):
         """
         Send the information that new files have been put in the website
         If the information has been sent, then change the status to 1
@@ -225,17 +228,15 @@ class Course(object):
                 title = '【' + 'New File ' + self.name + '】' + newfile[1]
                 text = 'Detail: \n\n    ' + newfile[2] + '\n\n'
                 text += 'File size: \n\n    ' + newfile[3] + '\n\n'
-                mail.send_to_email(title, text)
+                mail.send_to_email(title, text, user[2])
                 self.file[key][4] = 1
                 sql = "update File set send_state = '%d' \
-                       where course_id = '%s' and file_id = '%s'" % (1, self.course_id, key)
+                       where course_id = '%s' and file_id = '%s' and user_id = '%s'" \
+                       % (1, self.course_id, key, user[0])
                 db.update(sql)
-                #print("new file \n")
-                #break
 
-    def send_newnotice(self, spider):
+    def send_newnotice(self, spider, user):
         spider.get_html(urls.notice + self.course_id)
-        print('Try to do this:\n\n' + spider.html + '\n\n')
         for notice in parse.get_newnotice(spider.html, self.news[1], self.enable_notice):
             url = urls.notice_detail + notice[0]
             spider.get_html(url)
@@ -243,7 +244,7 @@ class Course(object):
             title = '【' + 'New Notice ' + self.name +  '】' + notice[1]
             text = 'author: \n' + notice[2] + '\n\n'
             text += 'detail: \n' + detail
-            mail.send_to_email(title, text)
+            mail.send_to_email(title, text, user[2])
 
 
     def __str__(self):

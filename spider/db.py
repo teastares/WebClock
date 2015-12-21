@@ -46,13 +46,13 @@ class database(object):
     def update(self, sql):
         flag = False
         if(self._conn):
-            # try:
-            self._cursor.execute(sql)
-            self._conn.commit()
-            flag = True
-            # except Exception:
-            #     flag = False
-            #     print("Database Update Failed!")
+            try:
+                self._cursor.execute(sql)
+                self._conn.commit()
+                flag = True
+            except Exception:
+                flag = False
+                print("Database Update Failed!")
         return flag
 
     #close the database
@@ -68,5 +68,5 @@ class database(object):
 
 
     def get_user(self):
-        sql = "select user_id, user_passwd, user_email from User"
+        sql = "select user_id, user_passwd, user_email, user_state from User"
         return self.fetch_all(sql)

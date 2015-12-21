@@ -28,7 +28,7 @@ class mail_sender():
         self.sender.sendmail(self.user,to_user,msg.as_string())
         self.sender.close()
 
-def send_to_email(title, text):
+def send_to_email(title, text, email):
     """
     This is the function to send the message to the email.
     title refer to the title of the message,
@@ -39,7 +39,7 @@ def send_to_email(title, text):
         mail_host = mail_info["host"]
         mail_user = mail_info["user"]
         mail_psw = mail_info["userpass"]
-        to_user = mail_info["to_user"]
+        to_user = email
         if mail_host == '*' or mail_user == '*' or mail_psw == "*":
             mail_host = input("Sending mail's host: ")
             mail_user = input("Sending mail's username: ")

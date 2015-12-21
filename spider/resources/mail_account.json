@@ -1,6 +1,5 @@
 {
-	"host" : "*",
-	"user" : "*",
-	"userpass": "*",
-	"to_user" : "*"
+	"host" : "smtp.exmail.qq.com",
+	"user" : "public@yourteast.com",
+	"userpass": "WebClockv1.2"
 }
