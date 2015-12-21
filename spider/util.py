@@ -41,6 +41,10 @@ class Student(object):
     def login(self):
         self.spider.login(urls.login, self.account, self.headers)
 
+    def is_logged(self):
+        html = self.spider.session.get(urls.courses).text
+        print(len(html))
+
     def get_courses(self, db):
         """
         To get the courses for one student, from the database
@@ -125,28 +129,60 @@ class Course(object):
             data = db.fetch_all(sql)
             if not data:
                 deadline = datetime.strptime(info[4] + '-23-59-59', "%Y-%m-%d-%H-%M-%S")
-                if deadline < datetime.today() or info[3] == "已经提交":
-                    if info[0] in self.homework:
-                        del self.homework[info[0]]
 
-                elif info[0] not in self.homework:
-                    #for every homework, [url, title, deadline, send_state, alarm_state]
+                #for every homework, [url, title, deadline, send_state, alarm_state]
+                if deadline > datetime.today() and info[3] == "尚未提交":
                     self.homework[info[0]] = [info[1], info[2],deadline, 0, 0]
                     sql = "insert into Homework(course_id, homework_id, url, \
                            homework_name, deadline, send_state, alarm_state) \
                            values ('%s', '%s', '%s', '%s', '%s', '%d', '%d')" \
-                           %(self.course_id, info[0], info[1], info[2], info[4], 0, 0)
+                           %(self.course_id, info[0], info[1], info[2], deadline, 0, 0)
                     db.update(sql)
             else:
                 if data[0][0] < datetime.today() or info[3] == "已经提交":
-                    if info[0] in self.homework:
-                        del self.homework[info[0]]
-                    sql = "delete * from Homework where course_id = '%s' and homework_id = '%s'" \
+                    sql = "delete from Homework where course_id = '%s' and homework_id = '%s'" \
                            % (self.course_id, info[0])
                     db.update(sql)
                 else:
                     self.homework[info[0]] = [info[1], info[2], data[0][0], data[0][1], data[0][2]]
 
+
+    def send_newhomework(self, spider, db):
+        for key, homework in self.homework.items():
+            if homework[3] == 0:
+                spider.get_html(urls.homework_detail + homework[0])
+                info = parse.get_homeworkdetail(spider.html)
+                if info == '':
+                    info = 'NULL'
+                title = '【' + 'New HomeWork ' + self.name +  '】' + homework[1]
+                text = 'Instruction:\n' + info + '\n\n'
+                text += 'Deadline:\n' + str(homework[2])
+                mail.send_to_email(title, text)
+                homework[3] = 1
+                sql = "update Homework set send_state = '%d' \
+                       where course_id = '%s' and homework_id = '%s'" % (homework[3], self.course_id, key)
+                db.update(sql)
+
+    def alarm_homework(self, db):
+        for key, homework in self.homework.items():
+            residual_time = (homework[2] - datetime.today()).total_seconds()
+            title = '【' + 'Homework Alarm ' + self.name +  '】' + homework[1]
+            text = 'Deadline:\n' + str(homework[2]) + '\n\n'
+            if homework[4] == 0 and residual_time <= 172800:
+                text += 'The residual time is less than 48 hours.\n\n'
+                mail.send_to_email(title, text)
+                homework[4] += 1
+            elif homework[4] == 1 and residual_time <= 43200:
+                text += 'The residual time is less than 12 hours.\n\n'
+                mail.send_to_email(title, text)
+                homework[4] += 1
+            elif homework[4] == 2 and residual_time <= 10800:
+                text += 'The residual time is less than 3 hours.\n\n'
+                mail.send_to_email(title, text)
+                homework[4] += 1
+            sql = "update Homework set alarm_state = '%d' \
+                   where course_id = '%s' and homework_id = '%s'" % (homework[4], self.course_id, key)
+            db.update(sql)
 
     def get_newfile(self, spider, db):
         """
@@ -197,47 +233,9 @@ class Course(object):
                 #print("new file \n")
                 #break
 
-
-    def send_newhomework(self, spider, db):
-        for key, homework in self.homework.items():
-            if homework[3] == 0:
-                spider.get_html(urls.homework_detail + homework[0])
-                info = parse.get_homeworkdetail(spider.html)
-                if info == '':
-                    info = 'NULL'
-                title = '【' + 'New HomeWork ' + self.name +  '】' + homework[1]
-                text = 'Instruction:\n' + info + '\n\n'
-                text += 'Deadline:\n' + str(homework[2])
-                mail.send_to_email(title, text)
-                homework[3] = 1
-                sql = "update Homework set send_state = '%d' \
-                       where course_id = '%s' and homework_id = '%s'" % (homework[3], self.course_id, key)
-                db.update(sql)
-
-    def alarm_homework(self, db):
-        for key, homework in self.homework.items():
-            residual_time = (homework[2] - datetime.today()).total_seconds()
-            title = '【' + 'Homework Alarm ' + self.name +  '】' + homework[1]
-            text = 'Deadline:\n' + str(homework[2]) + '\n\n'
-            if homework[4] == 0 and residual_time <= 172800:
-                text += 'The residual time is less than 48 hours.\n\n'
-                mail.send_to_email(title, text)
-                homework[4] += 1
-            elif homework[4] == 1 and residual_time <= 43200:
-                text += 'The residual time is less than 12 hours.\n\n'
-                mail.send_to_email(title, text)
-                homework[4] += 1
-            elif homework[4] == 2 and residual_time <= 10800:
-                text += 'The residual time is less than 3 hours.\n\n'
-                mail.send_to_email(title, text)
-                homework[4] += 1
-            sql = "update Homework set alarm_state = '%d' \
-                   where course_id = '%s' and homework_id = '%s'" % (homework[4], self.course_id, key)
-            db.update(sql)
-
     def send_newnotice(self, spider):
         spider.get_html(urls.notice + self.course_id)
-        #print('Try to do this:\n\n' + spider.html + '\n\n')
+        print('Try to do this:\n\n' + spider.html + '\n\n')
         for notice in parse.get_newnotice(spider.html, self.news[1], self.enable_notice):
             url = urls.notice_detail + notice[0]
             spider.get_html(url)

@@ -30,7 +30,8 @@ def get_news(html):
         info = [course_id]
         news = course.find_all('td')[1:]
         for item in news:
-            info.append(int(item.get_text()[0]))
+            new = re.match(r'(\d*)', item.get_text()).groups()[0]
+            info.append(int(new))
         yield(info)
 
 def get_newhomework(html):
@@ -77,7 +78,7 @@ def get_newnotice(html, num_unread, enable_notice):
         if enable_notice == 2 or state == '未读':
             count += 1
             info = (url, title, author)
-            yield(info) 
+            yield(info)
 
 def get_newfile(html, enable_file):
     """
@@ -98,17 +99,17 @@ def get_newfile(html, enable_file):
             file_id = tab_text + newfile.find('td', width = ["80"]).get_text()
             a = newfile.find('a')
             url = a['href']
-            title = a.get_text()        
+            title = a.get_text()
             detail = newfile.find('td', width = ["300"]).get_text()
             if detail == '':
-                detail = 'No detail!'            
+                detail = 'No detail!'
             filesize = newfile.find('td', width = ["80"], align = ["center"]).get_text()
             state = newfile.find_all('td', width = ["100"])[1].get_text()
             state = re.sub(r'[ \n\r\t]', '',state)
             if enable_file == 1 or state == '新文件':
                 info = (file_id, url, title, detail, filesize, 0)
                 yield(info)
-            
+
 def get_noticedetail(html):
     soup = BeautifulSoup(html, "html.parser")
     info = soup.find_all('td', class_ = ["tr_l2"])[1].get_text()

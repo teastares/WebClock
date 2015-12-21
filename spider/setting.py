@@ -33,7 +33,7 @@ Enable_File = 1
 Idle_Time is the number of seconds
 Between two scannings.
 """
-Idle_Time = 60
+Idle_Time = 0
 
 """
 Here describes the information of database.
