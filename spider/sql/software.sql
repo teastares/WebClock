@@ -8,19 +8,19 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
 -- -----------------------------------------------------
--- Schema mydb
+-- Schema webclock
 -- -----------------------------------------------------
 
 -- -----------------------------------------------------
--- Schema mydb
+-- Schema webclock
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `mydb` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
-USE `mydb` ;
+CREATE SCHEMA IF NOT EXISTS `webclock` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
+USE `webclock` ;
 
 -- -----------------------------------------------------
--- Table `mydb`.`User`
+-- Table `webclock`.`User`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`User` (
+CREATE TABLE IF NOT EXISTS `webclock`.`User` (
   `user_id` VARCHAR(45) NOT NULL COMMENT '',
   `user_passwd` VARCHAR(45) NOT NULL COMMENT '',
   `user_email` VARCHAR(45) NOT NULL COMMENT '',
@@ -29,9 +29,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`Course`
+-- Table `webclock`.`Course`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`Course` (
+CREATE TABLE IF NOT EXISTS `webclock`.`Course` (
   `course_id` VARCHAR(45) NOT NULL COMMENT '',
   `course_name` VARCHAR(45) NULL COMMENT '',
   `user_id` VARCHAR(45) NOT NULL COMMENT '',
@@ -44,16 +44,16 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Course` (
   INDEX `fk_Course_User_idx` (`user_id` ASC)  COMMENT '',
   CONSTRAINT `fk_Course_User`
     FOREIGN KEY (`user_id`)
-    REFERENCES `mydb`.`User` (`user_id`)
+    REFERENCES `webclock`.`User` (`user_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`Homework`
+-- Table `webclock`.`Homework`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`Homework` (
+CREATE TABLE IF NOT EXISTS `webclock`.`Homework` (
   `course_id` VARCHAR(45) NOT NULL COMMENT '',
   `send_state` INT NULL COMMENT '',
   `alarm_state` INT NULL COMMENT '',
@@ -65,16 +65,16 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Homework` (
   INDEX `fk_CourseHomework_Course1_idx` (`course_id` ASC)  COMMENT '',
   CONSTRAINT `fk_CourseHomework_Course1`
     FOREIGN KEY (`course_id`)
-    REFERENCES `mydb`.`Course` (`course_id`)
+    REFERENCES `webclock`.`Course` (`course_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`File`
+-- Table `webclock`.`File`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`File` (
+CREATE TABLE IF NOT EXISTS `webclock`.`File` (
   `file_id` VARCHAR(45) NOT NULL COMMENT '',
   `course_id` VARCHAR(45) NOT NULL COMMENT '',
   `send_state` INT NULL COMMENT '',
@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`File` (
   INDEX `fk_CourseFile_Course1_idx` (`course_id` ASC)  COMMENT '',
   CONSTRAINT `fk_CourseFile_Course1`
     FOREIGN KEY (`course_id`)
-    REFERENCES `mydb`.`Course` (`course_id`)
+    REFERENCES `webclock`.`Course` (`course_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;

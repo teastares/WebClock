@@ -40,7 +40,7 @@ class Student(object):
 
     def login(self):
         self.spider.login(urls.login, self.account, self.headers)
-        
+
     def get_courses(self, db):
         """
         To get the courses for one student, from the database
@@ -55,7 +55,7 @@ class Student(object):
                where Course.user_id = '%s'" % (self.account['userid'])
         result = db.fetch_all(sql)
         if not result:
-            self.spider.get_html(urls.courses)    
+            self.spider.get_html(urls.courses)
             for info in parse.get_courses(self.spider.html):
                 self.courses[info[0]] = Course(info[0], info[1], info[2])
                 sql = "insert into Course(course_id, course_name, user_id, course_enable, \
@@ -63,10 +63,10 @@ class Student(object):
                        values ('%s', '%s', '%s', '%d', '%d', '%d', '%d', '%s')" % \
                        (info[0], info[1], self.account['userid'], 1, 1, 1, 1, info[2])
                 db.update(sql)
-        else:                    
+        else:
             for info in result:
                 self.courses[info[0]] = Course(info[0], info[1], info[2], info[3], info[4], info[5], info[6])
-                
+
     def get_news(self):
         """
         To get to know how many new notice,
@@ -110,14 +110,14 @@ class Course(object):
         and then ask for more information for homework from the website
         do some needed issue
         and then compare them to see if the database should be renew
-        
+
         info[0] -> homework id, str
         info[1] -> url, str
         info[2] -> title, str
         info[3] -> state, str
         info[4] -> deadline, str
         """
-                      
+
         spider.get_html(urls.homework + self.course_id)
         for info in parse.get_newhomework(spider.html):
             sql = "select deadline, send_state, alarm_state from Homework \
@@ -127,7 +127,7 @@ class Course(object):
                 deadline = datetime.strptime(info[4] + '-23-59-59', "%Y-%m-%d-%H-%M-%S")
                 if deadline < datetime.today() or info[3] == "已经提交":
                     if info[0] in self.homework:
-                        del self.homework[info[0]]            
+                        del self.homework[info[0]]
 
                 elif info[0] not in self.homework:
                     #for every homework, [url, title, deadline, send_state, alarm_state]
@@ -135,18 +135,18 @@ class Course(object):
                     sql = "insert into Homework(course_id, homework_id, url, \
                            homework_name, deadline, send_state, alarm_state) \
                            values ('%s', '%s', '%s', '%s', '%s', '%d', '%d')" \
-                           %(self.course_id, info[0], info[1], info[2], info[4], 0, 0) 
-                    db.update(sql)                         
+                           %(self.course_id, info[0], info[1], info[2], info[4], 0, 0)
+                    db.update(sql)
             else:
                 if data[0][0] < datetime.today() or info[3] == "已经提交":
                     if info[0] in self.homework:
-                        del self.homework[info[0]]  
+                        del self.homework[info[0]]
                     sql = "delete * from Homework where course_id = '%s' and homework_id = '%s'" \
-                           % (course.course_id, info[0])
-                    db.update(sql)    
+                           % (self.course_id, info[0])
+                    db.update(sql)
                 else:
                     self.homework[info[0]] = [info[1], info[2], data[0][0], data[0][1], data[0][2]]
-    
+
 
     def get_newfile(self, spider, db):
         """
@@ -168,22 +168,22 @@ class Course(object):
             if not data:
                 sql = "insert into File(file_id, course_id, send_state) \
                        values ('%s', '%s', '%d')" \
-                       %(info[0], self.course_id, info[5]) 
-                db.update(sql) 
+                       %(info[0], self.course_id, info[5])
+                db.update(sql)
                 #print(info[0] +'\n'+ self.course_id +'\n'+ str(info[5]))
                 #break
                 if info[0] not in self.file:
-                    self.file[info[0]] = [info[1], info[2], info[3], info[4], info[5]]                             
+                    self.file[info[0]] = [info[1], info[2], info[3], info[4], info[5]]
             else:
                 if info[0] not in self.file:
                     self.file[info[0]] = [info[1], info[2], info[3], info[4], data[0][2]]
-               
-                    
+
+
     def send_newfile(self, spider, db):
         """
         Send the information that new files have been put in the website
         If the information has been sent, then change the status to 1
-        """  
+        """
         for key, newfile in self.file.items():
             if newfile[4] == 0:
                 title = '【' + 'New File ' + self.name + '】' + newfile[1]
@@ -192,12 +192,12 @@ class Course(object):
                 mail.send_to_email(title, text)
                 self.file[key][4] = 1
                 sql = "update File set send_state = '%d' \
-                       where course_id = '%s' and file_id = '%s'" % (1, self.course_id, key) 
+                       where course_id = '%s' and file_id = '%s'" % (1, self.course_id, key)
                 db.update(sql)
                 #print("new file \n")
                 #break
-    
-    
+
+
     def send_newhomework(self, spider, db):
         for key, homework in self.homework.items():
             if homework[3] == 0:
@@ -211,7 +211,7 @@ class Course(object):
                 mail.send_to_email(title, text)
                 homework[3] = 1
                 sql = "update Homework set send_state = '%d' \
-                       where course_id = '%s' and homework_id = '%s'" % (homework[3], self.course_id, key) 
+                       where course_id = '%s' and homework_id = '%s'" % (homework[3], self.course_id, key)
                 db.update(sql)
 
     def alarm_homework(self, db):
@@ -232,7 +232,7 @@ class Course(object):
                 mail.send_to_email(title, text)
                 homework[4] += 1
             sql = "update Homework set alarm_state = '%d' \
-                   where course_id = '%s' and homework_id = '%s'" % (homework[4], self.course_id, key) 
+                   where course_id = '%s' and homework_id = '%s'" % (homework[4], self.course_id, key)
             db.update(sql)
 
     def send_newnotice(self, spider):
@@ -246,9 +246,9 @@ class Course(object):
             text = 'author: \n' + notice[2] + '\n\n'
             text += 'detail: \n' + detail
             mail.send_to_email(title, text)
-    
-    
-    def __str__(self):  
+
+
+    def __str__(self):
         return self.name
 
 def get_account(user):
@@ -257,7 +257,7 @@ def get_account(user):
     account = {}
     account['userid'] = user[0]
     account['userpass'] = user[1]
-    account['useremail'] = user[2] 
+    account['useremail'] = user[2]
     return account
 
 def get_headers():
