@@ -3,7 +3,7 @@
 """
 This is the switch of debug, you should turn it off when the website is running for all internet users.
 """
-DEBUG = True
+DEBUG = False
 
 """
 Here describes the information of database.

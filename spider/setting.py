@@ -6,7 +6,7 @@ elif Enable_Mail = 1, we will enable the some function.
 Functions include:
     ** send_to_email() in mail.py **
 """
-Enable_Mail = 0
+Enable_Mail = 1
 
 """
 Idle_Time is the number of seconds
