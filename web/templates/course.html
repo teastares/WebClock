@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}
+<title>{{ course[2] }}</title>
+{% endblock %}
+{% block content %}
+<div class="contact">
+	<div class="container">
+	<h1>{{ course[2] }}</h1>
+	<p>
+		{% if course[4] == 1 %}
+		公告通知功能已打开
+		<a href={{ "/notice_disable/" + course[0]}}>
+			<button type="button" class="btn btn-1 btn-danger">关闭</button>
+		</a>
+		{% else %}
+		公告通知功能已关闭
+		<a href={{ "/notice_enable/" + course[0]}}>
+			<button type="button" class="btn btn-1 btn-success">打开</button>
+		</a>
+		{% endif %}
+		<p><br></p>
+		{% if course[5] == 1 %}
+		作业通知功能已打开
+		<a href={{ "/homework_disable/" + course[0]}}>
+			<button type="button" class="btn btn-1 btn-danger">关闭</button>
+		</a>
+		{% else %}
+		作业通知功能已关闭
+		<a href={{ "/homework_enable/" + course[0]}}>
+			<button type="button" class="btn btn-1 btn-success">打开</button>
+		</a>
+		{% endif %}
+		<p><br></p>
+		{% if course[6] == 1 %}
+		文件通知功能已打开
+		<a href={{ "/file_disable/" + course[0]}}>
+			<button type="button" class="btn btn-1 btn-danger">关闭</button>
+		</a>
+		{% else %}
+		文件通知功能已关闭
+		<a href={{ "/file_enable/" + course[0]}}>
+			<button type="button" class="btn btn-1 btn-success">打开</button>
+		</a>
+		{% endif %}
+	</p>
+	{% if homework %}
+	<p><br></p>
+	<h2>未交作业:</h2>
+	<p><br></p>
+	{% for item in homework %}
+	<h4>{{ item[3] }}</h4>
+	Deadline: {{ item[5] }}
+	{% endfor %}
+	{% endif %}
+	</div>
+</div>
+{% endblock %}

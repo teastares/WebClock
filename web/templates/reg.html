@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}
+<title>Login</title>
+{% endblock %}
+{% block content %}
+<div class="account">
+	<div class="container">
+		<div class="account_grid">
+			   <div class="col-md-6 login-right">
+				<form method="post">
+                    <div style="width: 312px;">
+                    <input type="text" class="form-control" name="user_id"
+					   placeholder="网络学堂账号">
+                   </div>
+
+                    <div style="width: 300px;">
+                    <input type="password" class="form-control" name="user_passwd"
+					   placeholder="网络学堂密码">
+                    </div>
+
+                    <div style="width: 312px;">
+                    <input type="text" class="form-control" name="user_email"
+                       placeholder="邮箱地址">
+                    </div>
+
+					<div class="word-in">
+				 		 <input type="submit" value="登陆">
+				  	</div>
+			   </form>
+			   </div>
+	           <div class="col-md-6 login-left">
+                    <h4>已经注册？</h4>
+           			<p>如果您已经在本网站注册，可以直接登陆。</p>
+       				<a class="acount-btn" href="/login">注册</a>
+			   </div>
+			   <div class="clearfix"> </div>
+			 </div>
+	</div>
+</div>
+<script>
+{% if message == 1 %}
+alert('非法的用户名或密码');
+{% elif message == 2 %}
+alert('邮箱格式不正确');
+{% endif %}
+</script>
+{% endblock %}

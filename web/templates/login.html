@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}
+<title>Login</title>
+{% endblock %}
+{% block content %}
+<div class="account">
+	<div class="container">
+		<div class="account_grid">
+			   <div class="col-md-6 login-right">
+				<form method="post">
+                    <div style="width: 312px;">
+                    <input type="text" class="form-control" name="user_id"
+					   placeholder="网络学堂账号">
+                   </div>
+
+                    <div style="width: 300px;">
+                    <input type="password" class="form-control" name="user_passwd"
+					   placeholder="网络学堂密码">
+                    </div>
+
+					<div class="word-in">
+				 		 <input type="submit" value="登陆">
+				  	</div>
+			   </form>
+			   </div>
+	           <div class="col-md-6 login-left">
+                    <h4>新用户？</h4>
+           			<p>您可以通过网络的账号密码来注册本网站的账号，另外还需要一个邮箱地址用来接受信息。</p>
+       				<a class="acount-btn" href="/reg">注册</a>
+			   </div>
+			   <div class="clearfix"> </div>
+			 </div>
+	</div>
+</div>
+{% if message == 1 %}
+<script>
+alert('用户名或密码错误');
+</script>
+{% endif %}
+{% endblock %}

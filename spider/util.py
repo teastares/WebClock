@@ -199,6 +199,7 @@ class Course(object):
         info[3] -> detail, str
         info[4] -> size, str
         info[5] -> send state, str, to indicate whether it is send or not, 0 indicates it hasn't been sent
+        info[6] -> update date
         """
         spider.get_html(urls.files + self.course_id)
         for info in parse.get_newfile(spider.html, self.enable_file):
@@ -206,14 +207,19 @@ class Course(object):
                    where course_id = '%s' and file_id = '%s' and user_id = '%s'" \
                    % (self.course_id, info[0], user[0])
             data = db.fetch_all(sql)
-            if not data:
+            """
+            Only record the files that less than 2 days.
+            """
+            update_date = datetime.strptime(info[6], "%Y-%m-%d")
+            delta_time = (datetime.today() - update_date).total_seconds()
+            if (not data) and (delta_time <= 172800):
                 sql = "insert into File(file_id, course_id, send_state, user_id) \
                        values ('%s', '%s', '%d', '%s')" \
                        %(info[0], self.course_id, info[5], user[0])
                 db.update(sql)
                 if info[0] not in self.file:
                     self.file[info[0]] = [info[1], info[2], info[3], info[4], info[5]]
-            else:
+            elif data:
                 if info[0] not in self.file:
                     self.file[info[0]] = [info[1], info[2], info[3], info[4], data[0][2]]
 

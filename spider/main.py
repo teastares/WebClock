@@ -4,14 +4,32 @@ import util
 import re
 import time
 import random
-import db
+import database
 
 if __name__ == '__main__':
 
-    db = db.database(setting.db_host, setting.db_user, setting.db_passwd, setting.db_database, setting.db_port, setting.db_charset)
-    db.connectMySQL()
     while True:
+
+        db = database.database(setting.db_host, setting.db_user, setting.db_passwd, setting.db_database, setting.db_port, setting.db_charset)
+        db.connectMySQL()
+
         for user in db.get_user():
+            """
+            user:
+            user[0] => user_id
+            user[1] => user_passwd
+            user[2] => user_email
+            user[3] => user_state
+
+            user_state:
+            -1 => do not scan the user.
+            0 => try to scan the user.
+            1 => successful to login.
+            2 => failed to login.
+            """
+            if user[3] == -1:
+                continue
+
             student = util.Student(user)
             student.login()
             if student.is_logged():
@@ -40,6 +58,5 @@ if __name__ == '__main__':
                 sql = "UPDATE User SET user_state = 2 \
                        WHERE user_id = '%s'" % user[0]
                 db.update(sql)
-        time.sleep(setting.Idle_Time)
 
-    db.close()
+        db.close()

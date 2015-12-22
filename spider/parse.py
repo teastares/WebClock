@@ -80,6 +80,11 @@ def get_newnotice(html, num_unread, enable_notice):
             info = (url, title, author)
             yield(info)
 
+def get_noticedetail(html):
+    soup = BeautifulSoup(html, "html.parser")
+    info = soup.find_all('td', class_ = ["tr_l2"])[1].get_text()
+    return(info)
+
 def get_newfile(html, enable_file):
     """
     For one course, get all the new file (if Enable_File == 1)
@@ -104,13 +109,11 @@ def get_newfile(html, enable_file):
             if detail == '':
                 detail = 'No detail!'
             filesize = newfile.find('td', width = ["80"], align = ["center"]).get_text()
-            state = newfile.find_all('td', width = ["100"])[1].get_text()
+            info =  newfile.find_all('td', width = ["100"])
+            date = info[0].get_text()
+            state = info[1].get_text()
             state = re.sub(r'[ \n\r\t]', '',state)
+            date = re.sub(r'[ \n\r\t]', '',date)
             if enable_file == 1 or state == '新文件':
-                info = (file_id, url, title, detail, filesize, 0)
+                info = (file_id, url, title, detail, filesize, 0, date)
                 yield(info)
-
-def get_noticedetail(html):
-    soup = BeautifulSoup(html, "html.parser")
-    info = soup.find_all('td', class_ = ["tr_l2"])[1].get_text()
-    return(info)

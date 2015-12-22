@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+{% block title %}
+<title>Base</title>
+{% endblock %}
+<link href="/static/css/bootstrap.css" rel="stylesheet" type="text/css" media="all" />
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="/static/js/jquery.min.js"></script>
+<!-- Custom Theme files -->
+<!--theme-style-->
+<link href="/static/css/style.css" rel="stylesheet" type="text/css" media="all" />
+<!--//theme-style-->
+<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+<!-- start menu -->
+<link href="/static/css/memenu.css" rel="stylesheet" type="text/css" media="all" />
+<script type="text/javascript" src="/static/js/memenu.js"></script>
+<script>$(document).ready(function(){$(".memenu").memenu();});</script>
+<script src="/static/js/simpleCart.min.js"> </script>
+<!-- slide -->
+<script src="/static/js/responsiveslides.min.js"></script>
+   <script>
+    $(function () {
+      $("#slider").responsiveSlides({
+      	auto: true,
+      	speed: 500,
+        namespace: "callbacks",
+        pager: true,
+      });
+    });
+  </script>
+</head>
+<body>
+<!--header-->
+<div class="header">
+	<div class="header-top">
+		<div class="container">
+            <div class="col-sm-4 world">
+				<ul >
+				</ul>
+			</div>
+			<div class="col-sm-4 logo">
+                <a href="/">
+				    <img src="/static/images/system/logo.png" alt=""\>
+                </a>
+			</div>
+			<div class="col-sm-4 header-left">
+                {% block option %}
+				<p class="log">
+                    <a href="/home">Home</a>
+                    <a href="/logout">Logout</a>
+                </p>
+                {% endblock %}
+				<div class="clearfix"> </div>
+    		</div>
+			<div class="clearfix"> </div>
+		</div>
+	</div>
+</div>
+<!--content-->
+{% block content %}
+{% endblock %}
+<!--//content-->
+<!--footer-->
+<div class="footer">
+
+	<div class="footer-bottom">
+		<div class="container">
+				<div class="clearfix"> </div>
+				<p class="footer-class">Copyright &copy; 2015. Teastore All rights reserved.</p>
+			</div>
+	</div>
+</div>
+
+<!--//footer-->
+</body>
+</html>

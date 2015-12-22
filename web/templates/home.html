@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}
+<title>Home</title>
+{% endblock %}
+{% block content %}
+<div class="contact">
+	<div class="container">
+		<h1>Home</h1>
+        <p>收信邮箱: {{ user[1] }}</p>
+        <p><br></p>
+        {% if user[2] == -1 %}
+        <p>扫描开关关闭 |
+            <a href="/switchon">
+                <button type="button" class="btn btn-1 btn-primary">打开</button>
+            </a>
+        </p>
+        {% else %}
+        <p>扫描开关打开 |
+            <a href="/switchoff">
+                <button type="button" class="btn btn-1 btn-danger">关闭</button>
+            </a>
+        </p>
+        {% endif %}
+        <p><br></p>
+		{% if user[2] == 0 %}
+		<p>正在扫描课程，请稍等</p>
+		{% elif user[2] == 2 %}
+		<p>用户名或密码错误</p>
+		{% elif user[2] == 1 %}
+		<h2>课程:</h2>
+        <p><br></p>
+		{% for course in courses %}
+		<p>
+		{% if course[2] == 1 %}
+		<a href={{ '/disable/' + course[0] }}><button type="button" class="btn btn-sm btn-danger">关闭</button></a>
+		{% else %}
+		<a href={{ '/enable/' + course[0] }}><button type="button" class="btn btn-sm btn-success">打开</button></a>
+		{% endif %}
+		<a href={{ '/course/' + course[0] }}>
+		{{ course[1] }}
+		</a>
+		</p>
+		<p><br></p>
+		{% endfor %}
+		{% endif %}
+	</div>
+</div>
+{% endblock %}
