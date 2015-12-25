@@ -173,18 +173,20 @@ class Course(object):
             residual_time = (homework[2] - datetime.today()).total_seconds()
             title = '【' + 'Homework Alarm ' + self.name +  '】' + homework[1]
             text = 'Deadline:\n' + str(homework[2]) + '\n\n'
-            if homework[4] == 0 and residual_time <= 172800:
-                text += 'The residual time is less than 48 hours.\n\n'
-                mail.send_to_email(title, text, user[2])
-                homework[4] += 1
-            elif homework[4] == 1 and residual_time <= 43200:
-                text += 'The residual time is less than 12 hours.\n\n'
-                mail.send_to_email(title, text, user[2])
-                homework[4] += 1
-            elif homework[4] == 2 and residual_time <= 10800:
+
+            if residual_time <= 10800 and homework[4] <= 2:
                 text += 'The residual time is less than 3 hours.\n\n'
                 mail.send_to_email(title, text, user[2])
-                homework[4] += 1
+                homework[4] = 3
+            elif residual_time <= 43200 and homework[4] <= 1:
+                text += 'The residual time is less than 12 hours.\n\n'
+                mail.send_to_email(title, text, user[2])
+                homework[4] = 2
+            elif residual_time <= 172800 and homework[4] == 0:
+                text += 'The residual time is less than 48 hours.\n\n'
+                mail.send_to_email(title, text, user[2])
+                homework[4] = 1
+
             sql = "update Homework set alarm_state = '%d' \
                    where course_id = '%s' and homework_id = '%s' and user_id = '%s'" \
                    % (homework[4], self.course_id, key, user[0])
